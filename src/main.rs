@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_inspector_egui::WorldInspectorPlugin;
 
 pub const HEIGHT: f32 = 720.0;
 pub const WIDTH: f32 = 1280.0;
@@ -16,6 +17,7 @@ fn main() {
         .add_startup_system(spawn_basic_scene)
         .add_startup_system(spawn_camera)
         .add_plugins(DefaultPlugins)
+        .add_plugin(WorldInspectorPlugin::new())
         .run();
 }
 
