@@ -1,4 +1,4 @@
-use bevy::{prelude::*, reflect::erased_serde::__private::serde::__private::de};
+use bevy::prelude::*;
 
 pub const HEIGHT: f32 = 720.0;
 pub const WIDTH: f32 = 1280.0;
@@ -40,6 +40,15 @@ fn spawn_basic_scene(
         mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
         material: materials.add(Color::rgb(0.67, 0.84, 0.92).into()),
         transform: Transform::from_xyz(0.0, 0.5, 0.0),
+        ..default()
+    });
+    commands.spawn_bundle(PointLightBundle {
+        point_light: PointLight {
+            intensity: 1500.0,
+            shadows_enabled: true,
+            ..default()
+        },
+        transform: Transform::from_xyz(4.0, 8.0, 4.0),
         ..default()
     });
 }
