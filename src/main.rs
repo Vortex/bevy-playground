@@ -1,62 +1,71 @@
-use bevy::prelude::*;
-use bevy_inspector_egui::WorldInspectorPlugin;
+use bevy::{prelude::*, render::camera::ScalingMode};
 
-pub const HEIGHT: f32 = 720.0;
-pub const WIDTH: f32 = 1280.0;
+pub const CLEAR: Color = Color::rgb(0.1, 0.1, 0.1);
+pub const RESOLUTION: f32 = 16.0 / 9.0;
 
 fn main() {
+    let height = 900.0;
     App::new()
-        .insert_resource(ClearColor(Color::rgb(0.2, 0.2, 0.2)))
+        .insert_resource(ClearColor(CLEAR))
         .insert_resource(WindowDescriptor {
-            width: WIDTH,
-            height: HEIGHT,
+            width: height * RESOLUTION,
+            height: height,
             title: "Bevy Playground".to_string(),
+            vsync: true,
             resizable: false,
             ..Default::default()
         })
-        .add_startup_system(spawn_basic_scene)
         .add_startup_system(spawn_camera)
+        .add_startup_system(spawn_player)
+        .add_startup_system_to_stage(StartupStage::PreStartup, load_ascii)
         .add_plugins(DefaultPlugins)
-        .add_plugin(WorldInspectorPlugin::new())
         .run();
 }
 
-fn spawn_camera(mut commands: Commands) {
-    commands.spawn_bundle(Camera3dBundle {
-        transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
-        ..default()
-    });
+fn spawn_player(mut commands: Commands, ascii: Res<AsciiSheet>) {
+    let mut sprite = TextureAtlasSprite::new(1);
+    sprite.color = Color::rgb(0.3, 0.3, 0.9);
+    sprite.custom_size = Some(Vec2::splat(1.0));
+
+    commands
+        .spawn_bundle(SpriteSheetBundle {
+            sprite: sprite,
+            texture_atlas: ascii.0.clone(),
+            transform: Transform {
+                translation: Vec3::new(0.0, 0.0, 900.0),
+                ..Default::default()
+            },
+            ..Default::default()
+        })
+        .insert(Name::new("Playert"));
 }
 
-fn spawn_basic_scene(
+fn spawn_camera(mut commands: Commands) {
+    let mut camera = OrthographicCameraBundle::new_2d();
+
+    camera.orthographic_projection.top = 1.0;
+    camera.orthographic_projection.bottom = -1.0;
+
+    camera.orthographic_projection.right = 1.0 * RESOLUTION;
+    camera.orthographic_projection.left = -1.0 * RESOLUTION;
+
+    camera.orthographic_projection.scaling_mode = ScalingMode::None;
+
+    commands.spawn_bundle(camera);
+}
+
+struct AsciiSheet(Handle<TextureAtlas>);
+
+fn load_ascii(
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
+    assets: Res<AssetServer>,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
 ) {
-    commands
-        .spawn_bundle(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Plane { size: 5.0 })),
-            material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-            ..default()
-        })
-        .insert(Name::new("Ground"));
-    commands
-        .spawn_bundle(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: materials.add(Color::rgb(0.67, 0.84, 0.92).into()),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
-            ..default()
-        })
-        .insert(Name::new("Cube"));
-    commands
-        .spawn_bundle(PointLightBundle {
-            point_light: PointLight {
-                intensity: 1500.0,
-                shadows_enabled: true,
-                ..default()
-            },
-            transform: Transform::from_xyz(4.0, 8.0, 4.0),
-            ..default()
-        })
-        .insert(Name::new("Light"));
+    let image = assets.load("Ascii.png");
+    let atlas =
+        TextureAtlas::from_grid_with_padding(image, Vec2::splat(9.0), 16, 16, Vec2::splat(2.0));
+
+    let atlas_handle = texture_atlases.add(atlas);
+
+    commands.insert_resource(AsciiSheet(atlas_handle));
 }

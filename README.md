@@ -21,4 +21,8 @@ If you don't, you can read how to install it [here](https://www.rust-lang.org/le
  - Created the project
  - Basic scene with simple plane and a cube
  - Simple light with enabled shadows
- - Introduced EGui inspector plugin
+ 
+ 05.12.2022
+ ---
+ - Switched camera to 2D orthogonal
+ - Added simple sprite (will use better sprite sheet in the future)
