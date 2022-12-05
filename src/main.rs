@@ -1,4 +1,8 @@
+#![allow(clippy::redundant_field_names)]
 use bevy::{prelude::*, render::camera::ScalingMode};
+
+mod player;
+use player::PlayerPlugin;
 
 pub const CLEAR: Color = Color::rgb(0.1, 0.1, 0.1);
 pub const RESOLUTION: f32 = 16.0 / 9.0;
@@ -16,48 +20,10 @@ fn main() {
             ..Default::default()
         })
         .add_startup_system(spawn_camera)
-        .add_startup_system(spawn_player)
+        .add_plugin(PlayerPlugin)
         .add_startup_system_to_stage(StartupStage::PreStartup, load_ascii)
         .add_plugins(DefaultPlugins)
         .run();
-}
-
-fn spawn_player(mut commands: Commands, ascii: Res<AsciiSheet>) {
-    let mut sprite = TextureAtlasSprite::new(1);
-    sprite.color = Color::rgb(0.3, 0.3, 0.9);
-    sprite.custom_size = Some(Vec2::splat(1.0));
-
-    let player = commands
-        .spawn_bundle(SpriteSheetBundle {
-            sprite: sprite,
-            texture_atlas: ascii.0.clone(),
-            transform: Transform {
-                translation: Vec3::new(0.0, 0.0, 900.0),
-                ..Default::default()
-            },
-            ..Default::default()
-        })
-        .insert(Name::new("Playert"))
-        .id();
-
-    let mut background_sprite = TextureAtlasSprite::new(0);
-    background_sprite.color = Color::rgb(0.5, 0.5, 0.5);
-    background_sprite.custom_size = Some(Vec2::splat(1.0));
-
-    let background = commands
-        .spawn_bundle(SpriteSheetBundle {
-            sprite: background_sprite,
-            texture_atlas: ascii.0.clone(),
-            transform: Transform {
-                translation: Vec3::new(0.0, 0.0, -1.0),
-                ..Default::default()
-            },
-            ..Default::default()
-        })
-        .insert(Name::new("Background"))
-        .id();
-
-    commands.entity(player).push_children(&[background]);
 }
 
 fn spawn_camera(mut commands: Commands) {

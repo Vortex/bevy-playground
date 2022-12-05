@@ -26,3 +26,4 @@ If you don't, you can read how to install it [here](https://www.rust-lang.org/le
  ---
  - Switched camera to 2D orthogonal
  - Added simple sprite (will use better sprite sheet in the future)
+ - Moved the player stuff to separate plugin (PlayerPlugin)
