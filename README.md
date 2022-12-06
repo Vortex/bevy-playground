@@ -32,3 +32,4 @@ If you don't, you can read how to install it [here](https://www.rust-lang.org/le
  06.12.2022
  ---
  - Introduced debug with bevy-egui
+ - Introduced simple tile map using text file
