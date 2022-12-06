@@ -24,6 +24,7 @@ If you don't, you can read how to install it [here](https://www.rust-lang.org/le
  - Camera follow added to player
  - Introduced combat state
  - Hide player and map in combat state (at the moment combat state is activated when the player hits the grass which is ~ tiles), hitting space bar brings the state back
+ - Timed encounters
 
  05.12.2022
  ---
