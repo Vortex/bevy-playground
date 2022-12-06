@@ -15,20 +15,6 @@ It's that simple. :)
 If you don't, you can read how to install it [here](https://www.rust-lang.org/learn/get-started).
 
  ## Changelog
-
- 02.12.2022
- ---
- - Created the project
- - Basic scene with simple plane and a cube
- - Simple light with enabled shadows
- 
- 05.12.2022
- ---
- - Switched camera to 2D orthogonal
- - Added simple sprite (will use better sprite sheet in the future)
- - Moved the player stuff to separate plugin (PlayerPlugin)
- - Basic movement with (WSAD) and updated tile size
-
  06.12.2022
  ---
  - Introduced debug with bevy-egui
@@ -36,3 +22,17 @@ If you don't, you can read how to install it [here](https://www.rust-lang.org/le
  - Moved all the tile entities under single parent (Map)
  - Added simple collision detection
  - Camera follow added to player
+
+ 05.12.2022
+ ---
+ - Switched camera to 2D orthogonal
+ - Added simple sprite (will use better sprite sheet in the future)
+ - Moved the player stuff to separate plugin (PlayerPlugin)
+ - Basic movement with (WSAD) and updated tile size
+ 
+ 02.12.2022
+ ---
+ - Created the project
+ - Basic scene with simple plane and a cube
+ - Simple light with enabled shadows
+ 
