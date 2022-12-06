@@ -3,7 +3,7 @@ use bevy_inspector_egui::Inspectable;
 
 use crate::{
     ascii::{spawn_ascii_sprite, AsciiSheet},
-    tilemap::TileCollider,
+    tilemap::{EncounterSpawner, TileCollider},
     GameState, TILE_SIZE,
 };
 
@@ -12,6 +12,7 @@ pub struct PlayerPlugin;
 #[derive(Component, Inspectable)]
 pub struct Player {
     speed: f32,
+    just_moved: bool,
 }
 
 impl Plugin for PlayerPlugin {
@@ -72,15 +73,17 @@ fn show_player(
 }
 
 fn player_encounter_checking(
-    player_query: Query<&Transform, With<Player>>,
-    encounter_query: Query<&Transform, (Without<Player>, With<Camera>)>,
+    player_query: Query<(&Player, &Transform)>,
+    encounter_query: Query<&Transform, (Without<Player>, With<EncounterSpawner>)>,
     mut state: ResMut<State<GameState>>,
 ) {
-    let player_translation = player_query.single().translation;
+    let (player, player_transform) = player_query.single();
+    let player_translation = player_transform.translation;
 
-    if encounter_query
-        .iter()
-        .any(|&transform| wall_collision_check(player_translation, transform.translation))
+    if player.just_moved
+        && encounter_query
+            .iter()
+            .any(|&transform| wall_collision_check(player_translation, transform.translation))
     {
         println!("Changing to combat");
         state
@@ -101,12 +104,13 @@ fn camera_follow(
 }
 
 fn player_movement(
-    mut player_query: Query<(&Player, &mut Transform)>,
+    mut player_query: Query<(&mut Player, &mut Transform)>,
     wall_query: Query<&Transform, (With<TileCollider>, Without<Player>)>,
     keyboard: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
-    let (player, mut transform) = player_query.single_mut();
+    let (mut player, mut transform) = player_query.single_mut();
+    player.just_moved = false;
 
     let mut y_delta = 0.0;
     if keyboard.pressed(KeyCode::W) {
@@ -131,6 +135,9 @@ fn player_movement(
         .iter()
         .any(|&transform| wall_collision_check(target, transform.translation))
     {
+        if x_delta != 0.0 {
+            player.just_moved = true;
+        }
         transform.translation = target;
     }
 
@@ -139,6 +146,9 @@ fn player_movement(
         .iter()
         .any(|&transform| wall_collision_check(target, transform.translation))
     {
+        if y_delta != 0.0 {
+            player.just_moved = true;
+        }
         transform.translation = target;
     }
 }
@@ -166,7 +176,10 @@ fn spawn_player(mut commands: Commands, ascii: Res<AsciiSheet>) {
     commands
         .entity(player)
         .insert(Name::new("Player"))
-        .insert(Player { speed: 3.0 })
+        .insert(Player {
+            speed: 3.0,
+            just_moved: false,
+        })
         .id();
 
     let background = spawn_ascii_sprite(
