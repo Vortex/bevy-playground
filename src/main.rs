@@ -1,7 +1,12 @@
 #![allow(clippy::redundant_field_names)]
 use bevy::{prelude::*, render::camera::ScalingMode};
 
+mod ascii;
+mod debug;
 mod player;
+
+use ascii::AsciiPlugin;
+use debug::DebugPlugin;
 use player::PlayerPlugin;
 
 pub const CLEAR: Color = Color::rgb(0.1, 0.1, 0.1);
@@ -16,14 +21,15 @@ fn main() {
             width: height * RESOLUTION,
             height: height,
             title: "Bevy Playground".to_string(),
-            vsync: true,
+            // vsync: true,
             resizable: false,
             ..Default::default()
         })
-        .add_startup_system(spawn_camera)
-        .add_plugin(PlayerPlugin)
-        .add_startup_system_to_stage(StartupStage::PreStartup, load_ascii)
         .add_plugins(DefaultPlugins)
+        .add_plugin(PlayerPlugin)
+        .add_plugin(AsciiPlugin)
+        .add_plugin(DebugPlugin)
+        .add_startup_system(spawn_camera)
         .run();
 }
 
@@ -39,20 +45,4 @@ fn spawn_camera(mut commands: Commands) {
     camera.orthographic_projection.scaling_mode = ScalingMode::None;
 
     commands.spawn_bundle(camera);
-}
-
-struct AsciiSheet(Handle<TextureAtlas>);
-
-fn load_ascii(
-    mut commands: Commands,
-    assets: Res<AssetServer>,
-    mut texture_atlases: ResMut<Assets<TextureAtlas>>,
-) {
-    let image = assets.load("Ascii.png");
-    let atlas =
-        TextureAtlas::from_grid_with_padding(image, Vec2::splat(9.0), 16, 16, Vec2::splat(2.0));
-
-    let atlas_handle = texture_atlases.add(atlas);
-
-    commands.insert_resource(AsciiSheet(atlas_handle));
 }

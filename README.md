@@ -28,3 +28,7 @@ If you don't, you can read how to install it [here](https://www.rust-lang.org/le
  - Added simple sprite (will use better sprite sheet in the future)
  - Moved the player stuff to separate plugin (PlayerPlugin)
  - Basic movement with (WSAD) and updated tile size
+
+ 06.12.2022
+ ---
+ - Introduced debug with bevy-egui
