@@ -10,6 +10,9 @@ use crate::{
 pub struct TileMapPlugin;
 
 #[derive(Component)]
+pub struct EncounterSpawner;
+
+#[derive(Component)]
 pub struct TileCollider;
 
 impl Plugin for TileMapPlugin {
@@ -34,6 +37,9 @@ fn create_simple_map(mut commands: Commands, ascii: Res<AsciiSheet>) {
                 );
                 if char == '#' {
                     commands.entity(tile).insert(TileCollider);
+                }
+                if char == '~' {
+                    commands.entity(tile).insert(EncounterSpawner);
                 }
                 tiles.push(tile);
             }

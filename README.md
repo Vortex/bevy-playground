@@ -22,6 +22,7 @@ If you don't, you can read how to install it [here](https://www.rust-lang.org/le
  - Moved all the tile entities under single parent (Map)
  - Added simple collision detection
  - Camera follow added to player
+ - Introduced combat state
 
  05.12.2022
  ---
@@ -29,7 +30,7 @@ If you don't, you can read how to install it [here](https://www.rust-lang.org/le
  - Added simple sprite (will use better sprite sheet in the future)
  - Moved the player stuff to separate plugin (PlayerPlugin)
  - Basic movement with (WSAD) and updated tile size
- 
+
  02.12.2022
  ---
  - Created the project
