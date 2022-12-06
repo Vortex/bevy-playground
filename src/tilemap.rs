@@ -9,6 +9,9 @@ use crate::{
 
 pub struct TileMapPlugin;
 
+#[derive(Component)]
+pub struct TileCollider;
+
 impl Plugin for TileMapPlugin {
     fn build(&self, app: &mut App) {
         app.add_startup_system(create_simple_map);
@@ -29,6 +32,9 @@ fn create_simple_map(mut commands: Commands, ascii: Res<AsciiSheet>) {
                     Color::rgb(0.9, 0.9, 0.9),
                     Vec3::new(x as f32 * TILE_SIZE, -(y as f32) * TILE_SIZE, 100.0),
                 );
+                if char == '#' {
+                    commands.entity(tile).insert(TileCollider);
+                }
                 tiles.push(tile);
             }
         }

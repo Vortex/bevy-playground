@@ -34,3 +34,4 @@ If you don't, you can read how to install it [here](https://www.rust-lang.org/le
  - Introduced debug with bevy-egui
  - Introduced simple tile map using text file
  - Moved all the tile entities under single parent (Map)
+ - Added simple collision detection

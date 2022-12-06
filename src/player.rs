@@ -1,8 +1,9 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::collide_aabb::collide};
 use bevy_inspector_egui::Inspectable;
 
 use crate::{
     ascii::{spawn_ascii_sprite, AsciiSheet},
+    tilemap::TileCollider,
     TILE_SIZE,
 };
 
@@ -22,26 +23,58 @@ impl Plugin for PlayerPlugin {
 
 fn player_movement(
     mut player_query: Query<(&Player, &mut Transform)>,
+    wall_query: Query<&Transform, (With<TileCollider>, Without<Player>)>,
     keyboard: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
     let (player, mut transform) = player_query.single_mut();
 
+    let mut y_delta = 0.0;
     if keyboard.pressed(KeyCode::W) {
-        transform.translation.y += player.speed * TILE_SIZE * time.delta_seconds();
+        y_delta += player.speed * TILE_SIZE * time.delta_seconds();
     }
 
     if keyboard.pressed(KeyCode::S) {
-        transform.translation.y -= player.speed * TILE_SIZE * time.delta_seconds();
+        y_delta -= player.speed * TILE_SIZE * time.delta_seconds();
     }
 
+    let mut x_delta = 0.0;
     if keyboard.pressed(KeyCode::A) {
-        transform.translation.x -= player.speed * TILE_SIZE * time.delta_seconds();
+        x_delta -= player.speed * TILE_SIZE * time.delta_seconds();
     }
 
     if keyboard.pressed(KeyCode::D) {
-        transform.translation.x += player.speed * TILE_SIZE * time.delta_seconds();
+        x_delta += player.speed * TILE_SIZE * time.delta_seconds();
     }
+
+    let target = transform.translation + Vec3::new(x_delta, 0.0, 0.0);
+    if wall_collision_check(target, &wall_query) {
+        transform.translation = target;
+    }
+
+    let target = transform.translation + Vec3::new(0.0, y_delta, 0.0);
+    if wall_collision_check(target, &wall_query) {
+        transform.translation = target;
+    }
+}
+
+fn wall_collision_check(
+    target_player_pos: Vec3,
+    wall_query: &Query<&Transform, (With<TileCollider>, Without<Player>)>,
+) -> bool {
+    for wall_transform in wall_query.iter() {
+        let collision = collide(
+            target_player_pos,
+            Vec2::splat(TILE_SIZE * 0.9),
+            wall_transform.translation,
+            Vec2::splat(TILE_SIZE),
+        );
+
+        if collision.is_some() {
+            return false;
+        }
+    }
+    return true;
 }
 
 fn spawn_player(mut commands: Commands, ascii: Res<AsciiSheet>) {
