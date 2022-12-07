@@ -31,16 +31,7 @@ impl Plugin for PlayerPlugin {
                     .with_system(camera_follow.after("movement"))
                     .with_system(player_movement.label("movement")),
             )
-            .add_system_set(SystemSet::on_update(GameState::Combat).with_system(test_exit_combat))
             .add_startup_system(spawn_player);
-    }
-}
-
-fn test_exit_combat(mut keyboard: ResMut<Input<KeyCode>>, mut state: ResMut<State<GameState>>) {
-    if keyboard.just_pressed(KeyCode::Space) {
-        println!("Changing to overworld");
-        state.set(GameState::Overworld).unwrap();
-        keyboard.clear();
     }
 }
 

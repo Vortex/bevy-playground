@@ -2,11 +2,13 @@
 use bevy::{prelude::*, render::camera::ScalingMode};
 
 mod ascii;
+mod combat;
 mod debug;
 mod player;
 mod tilemap;
 
 use ascii::AsciiPlugin;
+use combat::CombatPlugin;
 use debug::DebugPlugin;
 use player::PlayerPlugin;
 use tilemap::TileMapPlugin;
@@ -38,6 +40,7 @@ fn main() {
         .add_plugin(PlayerPlugin)
         .add_plugin(AsciiPlugin)
         .add_plugin(TileMapPlugin)
+        .add_plugin(CombatPlugin)
         .add_plugin(DebugPlugin)
         .add_startup_system(spawn_camera)
         .run();

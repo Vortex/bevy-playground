@@ -15,6 +15,11 @@ It's that simple. :)
 If you don't, you can read how to install it [here](https://www.rust-lang.org/learn/get-started).
 
  ## Changelog
+
+ 07.12.2022
+ ---
+ - Introduced enemy spawning 
+ 
  06.12.2022
  ---
  - Introduced debug with bevy-egui
