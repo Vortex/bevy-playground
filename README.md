@@ -19,6 +19,7 @@ If you don't, you can read how to install it [here](https://www.rust-lang.org/le
  07.12.2022
  ---
  - Introduced enemy spawning 
+ - Added fadeout during the transition from overworld to combat and vice versa
  
  06.12.2022
  ---

@@ -3,6 +3,7 @@ use bevy_inspector_egui::Inspectable;
 
 use crate::{
     ascii::{spawn_ascii_sprite, AsciiSheet},
+    fadeout::create_fadeout,
     tilemap::{EncounterSpawner, TileCollider},
     GameState, TILE_SIZE,
 };
@@ -18,6 +19,7 @@ pub struct EncounterTracker {
 #[derive(Component, Inspectable)]
 pub struct Player {
     speed: f32,
+    active: bool,
     just_moved: bool,
 }
 
@@ -53,11 +55,12 @@ fn hide_player(
 }
 
 fn show_player(
-    mut player_query: Query<&mut Visibility, With<Player>>,
+    mut player_query: Query<(&mut Player, &mut Visibility)>,
     children_query: Query<&Children, With<Player>>,
     mut child_visibility_query: Query<&mut Visibility, Without<Player>>,
 ) {
-    let mut player_vis = player_query.single_mut();
+    let (mut player, mut player_vis) = player_query.single_mut();
+    player.active = true;
     player_vis.is_visible = true;
 
     if let Ok(children) = children_query.get_single() {
@@ -70,12 +73,13 @@ fn show_player(
 }
 
 fn player_encounter_checking(
-    mut player_query: Query<(&Player, &mut EncounterTracker, &Transform)>,
-    encounter_query: Query<&Transform, (Without<Player>, With<EncounterSpawner>)>,
-    mut state: ResMut<State<GameState>>,
-    mut time: Res<Time>,
+    mut commands: Commands,
+    mut player_query: Query<(&mut Player, &mut EncounterTracker, &Transform)>,
+    encounter_query: Query<&Transform, (With<EncounterSpawner>, Without<Player>)>,
+    ascii: Res<AsciiSheet>,
+    time: Res<Time>,
 ) {
-    let (player, mut encounter_tracker, player_transform) = player_query.single_mut();
+    let (mut player, mut encounter_tracker, player_transform) = player_query.single_mut();
     let player_translation = player_transform.translation;
 
     if player.just_moved
@@ -86,10 +90,8 @@ fn player_encounter_checking(
         encounter_tracker.timer.tick(time.delta());
 
         if encounter_tracker.timer.just_finished() {
-            println!("Changing to combat");
-            state
-                .set(GameState::Combat)
-                .expect("Failed to change state");
+            player.active = false;
+            create_fadeout(&mut commands, GameState::Combat, &ascii);
         }
     }
 }
@@ -114,11 +116,14 @@ fn player_movement(
     let (mut player, mut transform) = player_query.single_mut();
     player.just_moved = false;
 
+    if !player.active {
+        return;
+    }
+
     let mut y_delta = 0.0;
     if keyboard.pressed(KeyCode::W) {
         y_delta += player.speed * TILE_SIZE * time.delta_seconds();
     }
-
     if keyboard.pressed(KeyCode::S) {
         y_delta -= player.speed * TILE_SIZE * time.delta_seconds();
     }
@@ -127,7 +132,6 @@ fn player_movement(
     if keyboard.pressed(KeyCode::A) {
         x_delta -= player.speed * TILE_SIZE * time.delta_seconds();
     }
-
     if keyboard.pressed(KeyCode::D) {
         x_delta += player.speed * TILE_SIZE * time.delta_seconds();
     }
@@ -162,7 +166,6 @@ fn wall_collision_check(target_player_pos: Vec3, wall_translation: Vec3) -> bool
         wall_translation,
         Vec2::splat(TILE_SIZE),
     );
-
     collision.is_some()
 }
 
@@ -171,7 +174,7 @@ fn spawn_player(mut commands: Commands, ascii: Res<AsciiSheet>) {
         &mut commands,
         &ascii,
         1,
-        Color::rgb(0.3, 0.3, 0.3),
+        Color::rgb(0.3, 0.3, 0.9),
         Vec3::new(2.0 * TILE_SIZE, -2.0 * TILE_SIZE, 900.0),
     );
 
@@ -180,6 +183,7 @@ fn spawn_player(mut commands: Commands, ascii: Res<AsciiSheet>) {
         .insert(Name::new("Player"))
         .insert(Player {
             speed: 3.0,
+            active: true,
             just_moved: false,
         })
         .insert(EncounterTracker {
@@ -198,7 +202,7 @@ fn spawn_player(mut commands: Commands, ascii: Res<AsciiSheet>) {
     commands
         .entity(background)
         .insert(Name::new("Background"))
-        .id();
+        .id(); //id() gives back the entity after creation
 
     commands.entity(player).push_children(&[background]);
 }

@@ -4,7 +4,7 @@ use crate::TILE_SIZE;
 
 pub struct AsciiPlugin;
 
-pub struct AsciiSheet(Handle<TextureAtlas>);
+pub struct AsciiSheet(pub Handle<TextureAtlas>);
 
 impl Plugin for AsciiPlugin {
     fn build(&self, app: &mut App) {
@@ -19,6 +19,8 @@ pub fn spawn_ascii_sprite(
     color: Color,
     translation: Vec3,
 ) -> Entity {
+    assert!(index < 256, "Index out of Ascii Range");
+
     let mut sprite = TextureAtlasSprite::new(index);
     sprite.color = color;
     sprite.custom_size = Some(Vec2::splat(TILE_SIZE));

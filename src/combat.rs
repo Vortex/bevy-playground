@@ -2,13 +2,14 @@ use bevy::prelude::*;
 
 use crate::{
     ascii::{spawn_ascii_sprite, AsciiSheet},
+    fadeout::create_fadeout,
     GameState,
 };
 
-pub struct CombatPlugin;
-
 #[derive(Component)]
 pub struct Enemy;
+
+pub struct CombatPlugin;
 
 impl Plugin for CombatPlugin {
     fn build(&self, app: &mut App) {
@@ -36,7 +37,6 @@ fn spawn_enemy(mut commands: Commands, ascii: Res<AsciiSheet>) {
         Color::rgb(0.8, 0.8, 0.8),
         Vec3::new(0.0, 0.5, 100.0),
     );
-
     commands
         .entity(sprite)
         .insert(Enemy)
@@ -49,10 +49,8 @@ fn despawn_enemy(mut commands: Commands, enemy_query: Query<Entity, With<Enemy>>
     }
 }
 
-fn test_exit_combat(mut keyboard: ResMut<Input<KeyCode>>, mut state: ResMut<State<GameState>>) {
+fn test_exit_combat(mut commands: Commands, keyboard: Res<Input<KeyCode>>, ascii: Res<AsciiSheet>) {
     if keyboard.just_pressed(KeyCode::Space) {
-        println!("Changing to overworld");
-        state.set(GameState::Overworld).unwrap();
-        keyboard.clear();
+        create_fadeout(&mut commands, GameState::Overworld, &ascii);
     }
 }
