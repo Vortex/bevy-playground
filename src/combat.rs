@@ -12,10 +12,20 @@ pub struct Enemy;
 
 impl Plugin for CombatPlugin {
     fn build(&self, app: &mut App) {
-        app.add_system_set(SystemSet::on_update(GameState::Combat).with_system(test_exit_combat))
-            .add_system_set(SystemSet::on_enter(GameState::Combat).with_system(spawn_enemy))
-            .add_system_set(SystemSet::on_exit(GameState::Combat).with_system(despawn_enemy));
+        app.add_system_set(
+            SystemSet::on_update(GameState::Combat)
+                .with_system(test_exit_combat)
+                .with_system(combat_camera),
+        )
+        .add_system_set(SystemSet::on_enter(GameState::Combat).with_system(spawn_enemy))
+        .add_system_set(SystemSet::on_exit(GameState::Combat).with_system(despawn_enemy));
     }
+}
+
+fn combat_camera(mut camera_query: Query<&mut Transform, With<Camera>>) {
+    let mut camera_transform = camera_query.single_mut();
+    camera_transform.translation.x = 0.0;
+    camera_transform.translation.y = 0.0;
 }
 
 fn spawn_enemy(mut commands: Commands, ascii: Res<AsciiSheet>) {
