@@ -16,6 +16,10 @@ If you don't, you can read how to install it [here](https://www.rust-lang.org/le
 
  ## Changelog
 
+ 08.12.2022
+ ---
+ - Player and enemy stats
+
  07.12.2022
  ---
  - Introduced enemy spawning 

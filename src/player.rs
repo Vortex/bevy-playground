@@ -3,6 +3,7 @@ use bevy_inspector_egui::Inspectable;
 
 use crate::{
     ascii::{spawn_ascii_sprite, AsciiSheet},
+    combat::CombatStats,
     fadeout::create_fadeout,
     tilemap::{EncounterSpawner, TileCollider},
     GameState, TILE_SIZE,
@@ -185,6 +186,12 @@ fn spawn_player(mut commands: Commands, ascii: Res<AsciiSheet>) {
             speed: 3.0,
             active: true,
             just_moved: false,
+        })
+        .insert(CombatStats {
+            health: 10,
+            max_health: 10,
+            attack: 2,
+            defense: 1,
         })
         .insert(EncounterTracker {
             timer: Timer::from_seconds(1.0, true),
