@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_inspector_egui::Inspectable;
 
 use crate::{
     ascii::{spawn_ascii_sprite, AsciiSheet},
@@ -17,7 +18,7 @@ pub struct FightEvent {
     damage_amount: isize,
 }
 
-#[derive(Component)]
+#[derive(Component, Inspectable)]
 pub struct CombatStats {
     pub health: isize,
     pub max_health: isize,
