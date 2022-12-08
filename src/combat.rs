@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use bevy_inspector_egui::Inspectable;
 
 use crate::{
-    ascii::{spawn_ascii_sprite, spawn_ascii_text, AsciiSheet},
+    ascii::{spawn_ascii_sprite, spawn_ascii_text, AsciiSheet, AsciiText},
     fadeout::create_fadeout,
     player::Player,
     GameState, TILE_SIZE,
@@ -45,10 +45,11 @@ fn damage_calculation(
     mut commands: Commands,
     ascii: Res<AsciiSheet>,
     mut fight_event: EventReader<FightEvent>,
-    mut target_query: Query<&mut CombatStats>,
+    text_query: Query<&AsciiText>,
+    mut target_query: Query<(&Children, &mut CombatStats)>,
 ) {
     for event in fight_event.iter() {
-        let mut target_stats = target_query
+        let (target_children, mut target_stats) = target_query
             .get_mut(event.target)
             .expect("Fighting target without stats!");
 
@@ -59,6 +60,23 @@ fn damage_calculation(
 
         if target_stats.health == 0 {
             create_fadeout(&mut commands, GameState::Overworld, &ascii);
+        }
+
+        // Update health
+        for child in target_children.iter() {
+            if text_query.get(*child).is_ok() {
+                // Delete old text
+                commands.entity(*child).despawn_recursive();
+
+                let new_health = spawn_ascii_text(
+                    &mut commands,
+                    &ascii,
+                    &format!("Health: {}", target_stats.health),
+                    Vec3::new(-4.5 * TILE_SIZE, 2.0 * TILE_SIZE, 100.0),
+                );
+
+                commands.entity(event.target).add_child(new_health);
+            }
         }
     }
 }
