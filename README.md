@@ -19,6 +19,7 @@ If you don't, you can read how to install it [here](https://www.rust-lang.org/le
  08.12.2022
  ---
  - Player and enemy stats
+ - Display enemy health stats
 
  07.12.2022
  ---

@@ -2,10 +2,10 @@ use bevy::prelude::*;
 use bevy_inspector_egui::Inspectable;
 
 use crate::{
-    ascii::{spawn_ascii_sprite, AsciiSheet},
+    ascii::{spawn_ascii_sprite, spawn_ascii_text, AsciiSheet},
     fadeout::create_fadeout,
     player::Player,
-    GameState,
+    GameState, TILE_SIZE,
 };
 
 #[derive(Component)]
@@ -87,6 +87,15 @@ fn combat_camera(mut camera_query: Query<&mut Transform, With<Camera>>) {
 }
 
 fn spawn_enemy(mut commands: Commands, ascii: Res<AsciiSheet>) {
+    let enemy_health = 3;
+
+    let health_text = spawn_ascii_text(
+        &mut commands,
+        &ascii,
+        &format!("Health: {}", enemy_health),
+        Vec3::new(-4.5 * TILE_SIZE, 2.0 * TILE_SIZE, 100.0),
+    );
+
     let sprite = spawn_ascii_sprite(
         &mut commands,
         &ascii,
@@ -103,7 +112,8 @@ fn spawn_enemy(mut commands: Commands, ascii: Res<AsciiSheet>) {
             attack: 3,
             defense: 1,
         })
-        .insert(Name::new("Bat"));
+        .insert(Name::new("Bat"))
+        .add_child(health_text);
 }
 
 fn despawn_enemy(mut commands: Commands, enemy_query: Query<Entity, With<Enemy>>) {
